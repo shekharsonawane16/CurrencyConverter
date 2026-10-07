@@ -4,7 +4,7 @@ A simple and responsive web-based Currency Converter that allows users to conver
 
 ## 🔗 Live Demo
 
-👉 [Open Currency Converter](https://shekharsonawane16.github.io/currency-converter/)
+👉 [Open Currency Converter](https://shekharsonawane16.github.io/CurrencyConverter/)
 
 ## 📌 About the Project
 
