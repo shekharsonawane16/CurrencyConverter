@@ -1,55 +1,129 @@
-// List of some common currencies
+// Supported currencies
 const currencyList = [
-    "USD", "EUR", "GBP", "INR", "JPY", "CNY", "AUD", "CAD", "CHF", "SGD", "ZAR"
+    "USD",
+    "EUR",
+    "GBP",
+    "INR",
+    "JPY",
+    "CNY",
+    "AUD",
+    "CAD",
+    "CHF",
+    "SGD",
+    "ZAR"
 ];
 
-const fromSelect = document.getElementById('from-currency');
-const toSelect = document.getElementById('to-currency');
-const resultDiv = document.getElementById('result');
+// Get HTML elements
+const amountInput = document.getElementById("amount");
+const fromSelect = document.getElementById("from-currency");
+const toSelect = document.getElementById("to-currency");
+const convertButton = document.getElementById("convert-btn");
+const resultDiv = document.getElementById("result");
+const rateInfo = document.getElementById("rate-info");
 
 // Populate currency dropdowns
-currencyList.forEach(cur => {
-    let option1 = document.createElement('option');
-    option1.value = cur;
-    option1.textContent = cur;
-    fromSelect.appendChild(option1);
+currencyList.forEach((currency) => {
 
-    let option2 = document.createElement('option');
-    option2.value = cur;
-    option2.textContent = cur;
-    toSelect.appendChild(option2);
+    const fromOption = document.createElement("option");
+    fromOption.value = currency;
+    fromOption.textContent = currency;
+    fromSelect.appendChild(fromOption);
+
+    const toOption = document.createElement("option");
+    toOption.value = currency;
+    toOption.textContent = currency;
+    toSelect.appendChild(toOption);
+
 });
+
+// Default currencies
 fromSelect.value = "USD";
 toSelect.value = "INR";
 
-// Fetch exchange rates and convert
+
+// Convert currency
 async function convertCurrency() {
-    const amount = parseFloat(document.getElementById('amount').value);
+
+    const amount = parseFloat(amountInput.value);
     const from = fromSelect.value;
     const to = toSelect.value;
 
-    if (isNaN(amount) || amount < 0) {
-        resultDiv.textContent = "Please enter a valid amount.";
-        return;
-    }
-    if (from === to) {
-        resultDiv.textContent = `${amount} ${from} = ${amount} ${to}`;
+    // Validate amount
+    if (isNaN(amount) || amount <= 0) {
+        resultDiv.textContent = "Please enter a valid amount greater than 0.";
+        rateInfo.textContent = "";
         return;
     }
 
+    // Same currency
+    if (from === to) {
+
+        resultDiv.textContent =
+            `${amount.toFixed(2)} ${from} = ${amount.toFixed(2)} ${to}`;
+
+        rateInfo.textContent = `Exchange rate: 1 ${from} = 1 ${to}`;
+
+        return;
+    }
+
+    // Loading message
     resultDiv.textContent = "Converting...";
+    rateInfo.textContent = "";
 
     try {
-        // Use a free API (exchangerate.host)
-        const resp = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amount}`);
-        const data = await resp.json();
 
-        if (data.result !== undefined) {
-            resultDiv.textContent = `${amount} ${from} = ${data.result.toFixed(3)} ${to}`;
-        } else {
-            resultDiv.textContent = "Conversion failed. Try again.";
+        // Frankfurter API
+        const apiUrl =
+            `https://api.frankfurter.dev/v2/rate/${from}/${to}`;
+
+        const response = await fetch(apiUrl);
+
+        // Check HTTP response
+        if (!response.ok) {
+            throw new Error("Unable to fetch exchange rate.");
         }
-    } catch (e) {
-        resultDiv.textContent = "Error fetching rates.";
+
+        const data = await response.json();
+
+        // Get exchange rate
+        const rate = data.rate;
+
+        if (!rate) {
+            throw new Error("Exchange rate not available.");
+        }
+
+        // Calculate converted amount
+        const convertedAmount = amount * rate;
+
+        // Display result
+        resultDiv.textContent =
+            `${amount.toFixed(2)} ${from} = ${convertedAmount.toFixed(2)} ${to}`;
+
+        // Display exchange rate
+        rateInfo.textContent =
+            `Exchange rate: 1 ${from} = ${rate.toFixed(4)} ${to}`;
+
+    } catch (error) {
+
+        console.error(error);
+
+        resultDiv.textContent =
+            "Unable to fetch exchange rate. Please try again.";
+
+        rateInfo.textContent = "";
     }
 }
+
+
+// Button click
+convertButton.addEventListener("click", convertCurrency);
+
+
+// Press Enter to convert
+amountInput.addEventListener("keydown", function (event) {
+
+    if (event.key === "Enter") {
+        convertCurrency();
+    }
+
+});
