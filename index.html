@@ -2,23 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Currency Converter App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
     <div class="converter-container">
+
         <h1>Currency Converter</h1>
+
         <div class="form-group">
-            <input type="number" id="amount" placeholder="Amount" value="1" min="0">
+            <input
+                type="number"
+                id="amount"
+                placeholder="Enter amount"
+                value="1"
+                min="0"
+                step="any"
+            >
         </div>
-        <div class="form-group">
-            <select id="from-currency"></select>
-            <span>to</span>
-            <select id="to-currency"></select>
+
+        <div class="currency-row">
+
+            <div class="currency-box">
+                <label for="from-currency">From</label>
+                <select id="from-currency"></select>
+            </div>
+
+            <span class="to-text">→</span>
+
+            <div class="currency-box">
+                <label for="to-currency">To</label>
+                <select id="to-currency"></select>
+            </div>
+
         </div>
-        <button onclick="convertCurrency()">Convert</button>
+
+        <button id="convert-btn">Convert</button>
+
         <div id="result"></div>
+
+        <div id="rate-info"></div>
+
     </div>
+
     <script src="script.js"></script>
+
 </body>
 </html>
